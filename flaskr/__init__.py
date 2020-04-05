@@ -19,7 +19,7 @@ def create_app(test_config=None):
     app.config.from_mapping(test_config)
 
   minio_client = Minio(
-    '9999119a.ngrok.io',
+    'localhost:9000',
     access_key='minioadmin',
     secret_key='minioadmin',
     secure=False
