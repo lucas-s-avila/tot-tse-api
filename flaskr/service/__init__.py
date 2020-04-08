@@ -2,6 +2,8 @@ from .ocr_lister import OcrLister
 from .ocr_downloader import OcrDownloader
 from .search_uploader import SearchUploader
 from .search_downloader import SearchDownloader
+from .searchable_dowloader import SearchableDownloader
 from .scheduler import Scheduler
 from .term_search_engine import TermSearchEngine
 from .search_service import SearchService
+from .highlight_service import HighlightService

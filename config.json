@@ -1,14 +1,14 @@
 {
   "scheduler" :
     {
-      "addr" : "http://f8a95233.ngrok.io"
+      "addr" : "http://tot.scheduler.cloud.c3.furg.br"
     },
 
   "minio" :
     {
-      "addr" : "localhost:9000",
-      "access_key" : "minioadmin",
-      "secret_key" : "minioadmin",
+      "addr" : "minio.cloud.c3.furg.br",
+      "access_key" : "lucas.avila",
+      "secret_key" : "lucas.avila",
       "secure" : false
     }
 }

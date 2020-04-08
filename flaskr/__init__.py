@@ -1,12 +1,12 @@
 import os
 import json
-from flask import Flask, jsonify, request, Response, stream_with_context
+from flask import Flask, jsonify, request, Response, stream_with_context, send_file
 from flask_cors import CORS
 from minio import Minio
 
 from .service import TermSearchEngine
 
-from .minio_driver import MinioOcrLister, MinioOcrDownloader, MinioSearchUploader, MinioSearchDownloader
+from .minio_driver import MinioOcrLister, MinioOcrDownloader, MinioSearchUploader, MinioSearchDownloader, MinioSearchableDownloader
 from .scheduler_driver import SchedulerAPI
 
 def create_app(routes_config: dict, app_config=None):
@@ -31,10 +31,14 @@ def create_app(routes_config: dict, app_config=None):
   ocr_downloader = MinioOcrDownloader(minio_client)
   search_uploader = MinioSearchUploader(minio_client)
   search_downloader = MinioSearchDownloader(minio_client)
+  searchable_downloader = MinioSearchableDownloader(minio_client)
   scheduler_api = SchedulerAPI(routes_config['scheduler']['addr'])
 
-  service = TermSearchEngine(scheduler_api, ocr_lister, ocr_downloader, search_uploader, search_downloader)
+  service = TermSearchEngine(scheduler_api, ocr_lister, ocr_downloader, search_uploader, search_downloader, searchable_downloader)
   
+  @app.route('/ping')
+  def ping():
+    return("tse-api is working.")
 
   @app.route('/available')
   def listAvailableFiles():
@@ -46,9 +50,15 @@ def create_app(routes_config: dict, app_config=None):
   def searchWord():
     word = request.args.get('word')
     ids = request.args.getlist('ids')
-    print(word)
-    print(ids)
     return Response(stream_with_context(service.search_term(word, ids)), mimetype='application/json')
+  
+  @app.route('/download')
+  def downloadMarked():
+    id_search = request.args.get('id_s')
+    id_file = request.args.get('id_f')
+    filename = service.mark_words(id_search, id_file)
+    print(filename)
+    return send_file(filename, as_attachment=True)
   
 
   CORS(app)

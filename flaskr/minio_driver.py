@@ -1,6 +1,6 @@
 import os
 
-from .service import OcrLister, OcrDownloader, SearchUploader, SearchDownloader
+from .service import OcrLister, OcrDownloader, SearchUploader, SearchDownloader, SearchableDownloader
 from minio import Minio
 
 class MinioOcrLister(OcrLister):
@@ -40,3 +40,13 @@ class MinioSearchDownloader(SearchDownloader):
         search_path: str = os.getcwd() + "/searchs/" + object_key
         self.minio_client.fget_object(bucket_name, object_key, search_path)
         return search_path
+
+class MinioSearchableDownloader(SearchableDownloader):
+
+    def __init__(self, minio_client:Minio):
+        self.minio_client = minio_client
+    
+    def download_searchable(self, bucket_name: str, object_key: str) -> str:
+        searchable_path: str = os.getcwd() + "/searchable/" + object_key
+        self.minio_client.fget_object(bucket_name, object_key, searchable_path)
+        return searchable_path
