@@ -7,31 +7,33 @@ from minio import Minio
 from .service import TermSearchEngine
 
 from .minio_driver import MinioOcrLister, MinioOcrDownloader, MinioSearchUploader, MinioSearchDownloader
+from .scheduler_driver import SchedulerAPI
 
-def create_app(test_config=None):
+def create_app(routes_config: dict, app_config=None):
   app = Flask(__name__, instance_relative_config=True)
   app.config.from_mapping(
     SECRET_KEY='dev' # TODO: Colocar algo mais seguro
   )
 
-  if test_config is None:
+  if app_config is None:
     app.config.from_pyfile('config.py', silent=True)
   else:
-    app.config.from_mapping(test_config)
+    app.config.from_mapping(app_config)
 
   minio_client = Minio(
-    'localhost:9000',
-    access_key='minioadmin',
-    secret_key='minioadmin',
-    secure=False
+    routes_config['minio']['addr'],
+    access_key=routes_config['minio']['access_key'],
+    secret_key=routes_config['minio']['secret_key'],
+    secure=routes_config['minio']['secure']
   )
 
   ocr_lister = MinioOcrLister(minio_client)
   ocr_downloader = MinioOcrDownloader(minio_client)
   search_uploader = MinioSearchUploader(minio_client)
   search_downloader = MinioSearchDownloader(minio_client)
+  scheduler_api = SchedulerAPI(routes_config['scheduler']['addr'])
 
-  service = TermSearchEngine('http://f8a95233.ngrok.io', ocr_lister, ocr_downloader, search_uploader, search_downloader)
+  service = TermSearchEngine(scheduler_api, ocr_lister, ocr_downloader, search_uploader, search_downloader)
   
 
   @app.route('/available')

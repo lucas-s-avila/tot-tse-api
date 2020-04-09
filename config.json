@@ -1,0 +1,14 @@
+{
+  "scheduler" :
+    {
+      "addr" : "http://f8a95233.ngrok.io"
+    },
+
+  "minio" :
+    {
+      "addr" : "localhost:9000",
+      "access_key" : "minioadmin",
+      "secret_key" : "minioadmin",
+      "secure" : false
+    }
+}

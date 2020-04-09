@@ -8,20 +8,21 @@ from .ocr_lister import OcrLister
 from .ocr_downloader import OcrDownloader
 from .search_uploader import SearchUploader
 from .search_downloader import SearchDownloader
+from .scheduler import Scheduler
 from .search_service import SearchService
 
 class TermSearchEngine:
 
   def __init__(
     self, 
-    scheduler_addr: str, 
+    scheduler: Scheduler, 
     ocr_lister: OcrLister, 
     ocr_downloader: OcrDownloader, 
     search_uploader: SearchUploader,
     search_downloader: SearchDownloader
   ):
     
-    self.scheduler_addr = scheduler_addr
+    self.scheduler = scheduler
     self.ocr_lister = ocr_lister
     self.ocr_downloader = ocr_downloader
     
@@ -40,14 +41,9 @@ class TermSearchEngine:
     print({
         'ids': ','.join(ids)
     })
-    resp = requests.get(
-      self.scheduler_addr + '/filenames',
-      {
-        'ids': ','.join(ids)
-      }
-    )
+    resp = self.scheduler.getFilename(ids)
     print(resp)
-    return resp.json()
+    return resp
 
   def save_search(self, search_id: uuid.UUID, file_id: str, matches: list):
     
@@ -64,11 +60,11 @@ class TermSearchEngine:
 
     def generate_result(term: str) -> str:
       for file_dict, file_path in self.search_service.search(term):
-        #sched_response = json.loads(requests.get(self.scheduler_addr + '/filenames',{'ids' : file_dict['id']}))
+        resp = self.scheduler.getFilename(file_dict['file_id'])
         response_dict = {
-          'search_id' : search_id,
+          'search_id' : str(search_id),
           'file_id' : file_dict['file_id'],
-          #'filename' : sched_response['filename'],
+          'filename' : resp[0]['filename'],
           'term' : term
         }
         matches = []
