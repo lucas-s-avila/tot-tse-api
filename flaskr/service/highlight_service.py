@@ -58,8 +58,7 @@ class HighlightService():
       print(bbox)
       image = Image.open(images[page-1])
       draw = ImageDraw.Draw(image)
-      draw.rectangle(bbox, outline=(0, 255, 50))
-      draw.rectangle((bbox[0]+1,bbox[1]+1, bbox[2]+1, bbox[3]+1), outline=(0, 255, 50))
+      draw.rectangle(bbox, outline=(255, 50, 0), width=4)
       image.save(images[page-1], 'png')
     
     pdf_path = self.workdir + file_dict['filename'] + ".pdf"

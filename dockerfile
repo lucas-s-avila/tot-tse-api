@@ -6,6 +6,7 @@ WORKDIR /app
 
 RUN apk add --no-cache jpeg-dev zlib-dev
 RUN apk add --no-cache --virtual .build-deps build-base linux-headers
+RUN apk add poppler-utils
 
 RUN pip install -r requirements.txt
 

@@ -49,8 +49,9 @@ def create_app(routes_config: dict, app_config=None):
   @app.route('/search')
   def searchWord():
     word = request.args.get('word')
-    ids = request.args.getlist('ids')
-    return Response(stream_with_context(service.search_term(word, ids)), mimetype='application/json')
+    ids = request.args.get('ids')
+    id_list = ids.split(',')
+    return Response(stream_with_context(service.search_term(word, id_list)), mimetype='application/json')
   
   @app.route('/download')
   def downloadMarked():
