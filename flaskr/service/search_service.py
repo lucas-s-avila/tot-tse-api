@@ -24,7 +24,7 @@ class SearchService():
                         match_dist = distance.nlevenshtein(word.text.casefold(),find_word)
                         if match_dist <= self.word_dist_thrs:
                             t=word.get("title")
-                            position = re.search(r'(?<=bbox) (?P<top>\d+) (?P<left>\d+) (?P<botton>\d+) (?P<right>\d+)',t).groupdict()
+                            position = re.search(r'(?<=bbox) (?P<left>\d+) (?P<top>\d+) (?P<right>\d+) (?P<botton>\d+)',t).groupdict()
                             ocr_conff = re.search(r'(?<=x_wconf )(\d+)',t).group(0)
                             match = {
                                 "page_id": page.get('id'),
@@ -42,10 +42,15 @@ class SearchService():
                             }
                             yield match
         return generate_matches()
+
+    def clean_files(self):
+        with os.scandir(self.workdir) as files:
+            for f in files:
+                os.remove(f)
         
     def search(self, term: str):
         files_to_search = os.listdir(self.workdir)
-        def generate_search() -> (dict, str):
+        def generate_search() -> dict:
             for file_name in files_to_search:
                 hocr = ET.parse(self.workdir+file_name)
                 generate_matches = self.find_word_in_hocr(hocr, term)
@@ -53,6 +58,6 @@ class SearchService():
                     "file_id": file_name,
                     "generate_matches": generate_matches
                 }
-                yield file_result, self.workdir+file_name
+                yield file_result
 
         return generate_search()
